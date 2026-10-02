@@ -92,7 +92,7 @@ Repository setup:
 3. Allow `main` to deploy to the `github-pages` environment. Configure required reviewers there if desired; reviewers must approve before deployment proceeds.
 4. Push or manually run the workflow on `main`, then inspect the deployment job and open its reported URL.
 
-The expected project URL is <https://hostlife22.github.io/audio-player--js/> unless a custom domain is configured. No root-relative asset paths or base-path configuration are needed. Do not treat the expected URL as evidence of a completed deployment. Deployment has not been verified from this workspace.
+The expected project URL is <https://hostlife22.github.io/verdant/> unless a custom domain is configured. No root-relative asset paths or base-path configuration are needed. Do not treat the expected URL as evidence of a completed deployment. Deployment has not been verified from this workspace.
 
 The workflow grants read-only repository access for checks and `pages: write` / `id-token: write` only to deployment. Pull requests cannot deploy. See GitHub's [custom Pages workflow documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) for the required Pages setup.
 

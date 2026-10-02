@@ -9,7 +9,7 @@ test('starts, grows, pauses, resumes, resets, and accepts keyboard controls with
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.clock.install();
-  await page.goto('/audio-player--js/');
+  await page.goto('/verdant/');
   await expect(page).toHaveTitle('Verdant — a study in growth');
   await page.clock.runFor(6000);
   await expect(page.locator('#phase')).toHaveText('Growing');

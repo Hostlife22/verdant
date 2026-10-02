@@ -19,4 +19,4 @@ This is not an accessibility conformance claim. Screen readers, forced-color mod
 
 ## Feedback
 
-Open an issue at <https://github.com/Hostlife22/audio-player--js/issues> with the affected control, steps, expected result, browser/OS, and assistive technology if applicable. Do not include personal or sensitive information. Contributions that improve usability and test coverage are welcome.
+Open an issue at <https://github.com/Hostlife22/verdant/issues> with the affected control, steps, expected result, browser/OS, and assistive technology if applicable. Do not include personal or sensitive information. Contributions that improve usability and test coverage are welcome.

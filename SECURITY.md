@@ -8,7 +8,7 @@ The application is a static client-side demonstration. It has no accounts, serve
 
 ## Reporting a vulnerability
 
-Check the repository's [Security page](https://github.com/Hostlife22/audio-player--js/security). If **Report a vulnerability** is available, submit a private report there with reproduction steps, affected revision, impact, and a suggested fix if available.
+Check the repository's [Security page](https://github.com/Hostlife22/verdant/security). If **Report a vulnerability** is available, submit a private report there with reproduction steps, affected revision, impact, and a suggested fix if available.
 
 Private vulnerability reporting may not be enabled. If the private reporting option is absent, open a minimal issue requesting a private contact channel, without exploit details or sensitive information. Wait for the maintainer to establish that channel before sharing details. Do not disclose secrets in public issues.
 

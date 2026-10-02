@@ -8,7 +8,7 @@ const server = createServer((request, response) => {
     if (
       request.url !== '/' &&
       request.url !== '/index.html' &&
-      request.url !== '/audio-player--js/'
+      request.url !== '/verdant/'
     ) {
       response.writeHead(404).end('Not found');
       return;
