@@ -1,0 +1,33 @@
+{
+  "name": "verdant-study",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An offline SVG plant study with spring physics and seamless growth cycles.",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "dev": "tsx scripts/serve.ts --dev",
+    "build": "tsx scripts/build.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run && playwright test",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.11.0",
+    "eslint-plugin-import-x": "^4.17.1",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}
