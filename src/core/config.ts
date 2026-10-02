@@ -4,10 +4,10 @@ export interface Parameters {
 }
 
 export interface LeafDefinition {
-  height: number;
-  side: number;
-  size: number;
-  delay: number;
+  readonly height: number;
+  readonly side: -1 | 1;
+  readonly size: number;
+  readonly delay: number;
 }
 
 export const CONFIG = {
@@ -16,9 +16,8 @@ export const CONFIG = {
   cycle: 20,
   growUntil: 11,
   fadeFrom: 17,
-  stemHeight: 350,
-  baseX: 300,
-  baseY: 465,
+  matureTime: 12,
+  leafEmergence: 0.07,
 } as const;
 
 export const DEFAULT_PARAMETERS: Readonly<Parameters> = {
@@ -36,6 +35,7 @@ export const LEAVES: readonly LeafDefinition[] = Array.from(
   }),
 );
 
-export function clamp(value: number, min: number, max: number): number {
-  return Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : min;
-}
+export const PARAMETER_LIMITS = {
+  wind: { min: 0, max: 2, step: 0.05 },
+  speed: { min: 0.5, max: 2, step: 0.1 },
+} as const;

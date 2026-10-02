@@ -59,25 +59,30 @@ Browser tests start their own server on port 4173; stop the dev server before ru
 
 ## Architecture
 
-| Module              | Responsibility                                              |
-| ------------------- | ----------------------------------------------------------- |
-| `src/config.ts`     | Typed parameters, supported bounds, timing, leaf geometry   |
-| `src/growth.ts`     | Pure growth curves and lifecycle phases                     |
-| `src/physics.ts`    | DOM-independent spring integration and wind field           |
-| `src/simulation.ts` | Fixed-step accumulator, pause/reset, loop state             |
-| `src/render.ts`     | SVG creation and projection of simulation state             |
-| `src/controls.ts`   | Native controls, value labels, listener disposal            |
-| `src/main.ts`       | Animation frame, visibility, reduced motion, page lifecycle |
-| `src/style.css`     | Shared color, type, spacing, and motion tokens              |
-| `scripts/`          | Build-time bundling and local HTTP server                   |
+| Module                          | Responsibility                                                         |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `src/core/config.ts`            | Timing, supported parameter bounds, leaf definitions                   |
+| `src/core/growth.ts`            | Pure growth curves and lifecycle phases                                |
+| `src/core/physics.ts`           | DOM-independent spring integration and wind field                      |
+| `src/core/simulation.ts`        | Private mutable state, read-only public view, fixed steps and commands |
+| `src/browser/render.ts`         | Scoped SVG rendering and owned-node cleanup                            |
+| `src/browser/controls.ts`       | Native input bindings; emits commands and renders control state        |
+| `src/browser/animation-loop.ts` | Idempotent frame scheduling through an injected scheduler              |
+| `src/browser/application.ts`    | Composition, playback intent, browser lifecycle, disposal              |
+| `src/browser/dom.ts`            | Scoped, type-checked element lookup                                    |
+| `src/main.ts`                   | Mounts the application; no other startup side effects                  |
+| `src/style.css`                 | Shared color, type, spacing, and motion tokens                         |
+| `scripts/`                      | Build-time bundling and local HTTP server                              |
+
+Dependencies point from browser adapters toward the core. `tsconfig.core.json` compiles the core without DOM or Node types, enforcing its browser independence. Controls depend on callback contracts rather than the simulation or SVG renderer. The simulation exposes a deeply read-only TypeScript view; retain a copy if you need a historical snapshot. See [architecture decisions](docs/architecture.md) for ownership and lifecycle details.
 
 The stem follows a curved centerline. Each leaf has independent angle and unfurl springs. Semi-implicit Euler integration uses bounded substeps, damping, and velocity/position limits. At the cycle seam the plant has zero visible area; hidden spring state resets while the seed remains. The progress indicator intentionally wraps to zero. This is a stylized botanical illustration, not a biological or fluid dynamics model.
 
-Listeners use abort signals. Pausing, hiding, or leaving the page cancels animation frames. Back-forward cache restoration resumes only when the user has not paused. No application timers or stored user data are used.
+The mounted application owns its simulation, renderer, controls, and frame loop. Disposal is idempotent and removes generated SVG leaves. Listeners use abort signals. Pausing, hiding, or leaving the page cancels animation frames. Back-forward cache restoration resumes only when the user has not paused. No application timers or stored user data are used.
 
 ## Verification
 
-Tests cover growth order, spring settling, pause/resume, reset, frame-rate agreement, loop boundaries, invalid inputs, and finite state across hundreds of cycles at supported extremes. Browser tests cover startup, keyboard interaction, reduced motion, uncaught errors, offline file loading, a repository subpath, and layouts at 320, 390, 768, and 1440 pixels. They also verify that the build contains only one HTML file and makes no external requests.
+Tests cover scheduler idempotence, cancellation, resumption without time jumps, disposal, render failures, growth order, spring settling, pause/resume, reset, frame-rate agreement, loop boundaries, invalid inputs, and finite state across hundreds of cycles at supported extremes. Browser tests cover synthetic page lifecycle events, startup, keyboard interaction, reduced motion, uncaught errors, offline file loading, a repository subpath, and layouts at 320, 390, 768, and 1440 pixels. They also verify that the build contains only one HTML file and makes no external requests.
 
 Chromium is the automated browser target. Firefox, Safari, physical mobile devices, and screen-reader behavior require manual verification. See [ACCESSIBILITY.md](ACCESSIBILITY.md).
 

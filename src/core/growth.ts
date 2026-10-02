@@ -1,4 +1,5 @@
-import { CONFIG, clamp } from './config';
+import { CONFIG } from './config';
+import { clamp } from './math';
 
 export interface Growth {
   stem: number;

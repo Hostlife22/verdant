@@ -14,7 +14,10 @@ Include screenshots for visible changes and explain any checks you could not run
 
 - Keep application source in strict TypeScript. Do not use `any`, suppressed errors, or unjustified assertions.
 - Order files as imports, blank line, interfaces/types, blank line, constants and implementation. Keep distinct declarations separated by blank lines.
-- Keep physics and growth independent of the DOM. Rendering and event handling belong in their own modules.
+- Keep `src/core` independent of DOM and Node APIs; `tsconfig.core.json` enforces this. Browser adapters live in `src/browser`.
+- Change simulation state through its commands. Public state is a read-only live view, not a saved snapshot.
+- Controls emit actions through callbacks; the application coordinates simulation, rendering, and scheduling. Keep imports free of startup side effects except `src/main.ts`.
+- Keep frame scheduling idempotent and disposal safe to call twice. Add lifecycle tests for new resources. See [architecture decisions](docs/architecture.md).
 - Use shared CSS custom properties for reusable visual values. Isolate decorative SVG geometry.
 - Keep runtime dependency-free. Development dependencies are allowed.
 - Use native controls with visible focus and labels. Honor reduced motion.

@@ -113,3 +113,68 @@ test('the production artifact works offline via file URL with no external resour
   expect(externalRequests).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+test('page suspension preserves playback intent, and final exit disposes controls and SVG nodes', async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.goto('/');
+  await page.clock.runFor(2000);
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new PageTransitionEvent('pagehide', { persisted: true }),
+    ),
+  );
+  const elapsed = await page.locator('#elapsed').textContent();
+  await page.clock.runFor(30000);
+  await expect(page.locator('#elapsed')).toHaveText(elapsed ?? '');
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new PageTransitionEvent('pageshow', { persisted: true }),
+    ),
+  );
+  await page.clock.runFor(1000);
+  expect(await page.locator('#elapsed').textContent()).not.toBe(elapsed);
+  await page.getByRole('button', { name: 'Pause animation' }).click();
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PageTransitionEvent('pagehide', { persisted: true }),
+    );
+    window.dispatchEvent(
+      new PageTransitionEvent('pageshow', { persisted: true }),
+    );
+  });
+  await expect(
+    page.getByRole('button', { name: 'Play animation' }),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PageTransitionEvent('pagehide', { persisted: false }),
+    );
+    window.dispatchEvent(
+      new PageTransitionEvent('pagehide', { persisted: false }),
+    );
+  });
+  await expect(page.locator('.leaf')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Play animation' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Play animation' }),
+  ).toBeVisible();
+});
+
+test('failed mounting reports invalid markup and removes partially created SVG nodes', async ({
+  page,
+}) => {
+  const html = (await readFile('dist/index.html', 'utf8')).replace(
+    'id="wind"',
+    'id="missing-wind"',
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.route('**/invalid-markup', (route) =>
+    route.fulfill({ contentType: 'text/html', body: html }),
+  );
+  await page.goto('/invalid-markup');
+  await expect.poll(() => errors).toEqual(['Missing element: #wind']);
+  await expect(page.locator('.leaf')).toHaveCount(0);
+});

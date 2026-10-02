@@ -1,4 +1,4 @@
-import { clamp } from './config';
+import { clamp } from './math';
 
 export interface Spring {
   value: number;

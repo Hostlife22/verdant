@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CONFIG } from '../src/config';
-import { growthAt } from '../src/growth';
-import { ANGLE_SPRING, integrateSpring } from '../src/physics';
-import { Simulation } from '../src/simulation';
+import { CONFIG } from '../src/core/config';
+import { growthAt } from '../src/core/growth';
+import { ANGLE_SPRING, integrateSpring } from '../src/core/physics';
+import { Simulation } from '../src/core/simulation';
 
 function advance(simulation: Simulation, seconds: number, fps = 60): void {
   for (let i = 0; i < Math.round(seconds * fps); i++)

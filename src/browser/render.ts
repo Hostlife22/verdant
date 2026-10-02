@@ -1,6 +1,7 @@
-import { CONFIG, LEAVES } from './config';
-import { growthAt, smooth } from './growth';
-import type { SimulationState } from './simulation';
+import { CONFIG, LEAVES } from '../core/config';
+import { growthAt, smooth } from '../core/growth';
+import { required } from './dom';
+import type { SimulationState } from '../core/simulation';
 
 interface LeafElements {
   group: SVGGElement;
@@ -19,26 +20,24 @@ function svgElement<K extends keyof SVGElementTagNameMap>(
   return element;
 }
 
-export function required<T extends Element>(
-  selector: string,
-  type: { new (): T },
-): T {
-  const element = document.querySelector(selector);
-  if (!(element instanceof type))
-    throw new Error(`Missing element: ${selector}`);
-  return element;
-}
+const GEOMETRY = { stemHeight: 350, baseX: 300, baseY: 465 } as const;
 
 export class Renderer {
-  private readonly plant = required('#plant', SVGGElement);
-  private readonly stem = required('#stem', SVGPathElement);
-  private readonly tip = required('#tip', SVGEllipseElement);
-  private readonly phase = required('#phase', HTMLElement);
-  private readonly progress = required('#progress', HTMLElement);
-  private readonly elapsed = required('#elapsed', HTMLElement);
+  private readonly plant: SVGGElement;
+  private readonly stem: SVGPathElement;
+  private readonly tip: SVGEllipseElement;
+  private readonly phase: HTMLElement;
+  private readonly progress: HTMLElement;
+  private readonly elapsed: HTMLElement;
   private readonly leaves: LeafElements[];
 
-  constructor() {
+  constructor(root: ParentNode) {
+    this.plant = required(root, '#plant', SVGGElement);
+    this.stem = required(root, '#stem', SVGPathElement);
+    this.tip = required(root, '#tip', SVGEllipseElement);
+    this.phase = required(root, '#phase', HTMLElement);
+    this.progress = required(root, '#progress', HTMLElement);
+    this.elapsed = required(root, '#elapsed', HTMLElement);
     this.leaves = LEAVES.map((definition, index) => {
       const group = svgElement('g', { class: 'leaf' });
       const body = svgElement('path', {
@@ -56,20 +55,24 @@ export class Renderer {
     });
   }
 
+  dispose(): void {
+    this.leaves.forEach(({ group }) => group.remove());
+  }
+
   render(state: SimulationState): void {
     const growth = growthAt(state.time);
-    const height = CONFIG.stemHeight * growth.stem;
+    const height = GEOMETRY.stemHeight * growth.stem;
     const bend = state.stem.value * 2.8;
     const xAt = (fraction: number): number =>
-      CONFIG.baseX + bend * fraction * fraction;
+      GEOMETRY.baseX + bend * fraction * fraction;
     this.plant.setAttribute('opacity', String(growth.opacity));
     this.stem.setAttribute(
       'd',
-      `M${CONFIG.baseX} ${CONFIG.baseY} Q${CONFIG.baseX} ${CONFIG.baseY - height * 0.5} ${xAt(growth.stem)} ${CONFIG.baseY - height}`,
+      `M${GEOMETRY.baseX} ${GEOMETRY.baseY} Q${GEOMETRY.baseX} ${GEOMETRY.baseY - height * 0.5} ${xAt(growth.stem)} ${GEOMETRY.baseY - height}`,
     );
     this.stem.setAttribute('stroke-width', String(3 + growth.stem * 3));
     this.tip.setAttribute('cx', String(xAt(growth.stem)));
-    this.tip.setAttribute('cy', String(CONFIG.baseY - height));
+    this.tip.setAttribute('cy', String(GEOMETRY.baseY - height));
     this.tip.setAttribute('opacity', String(smooth(growth.stem * 10)));
     this.leaves.forEach(({ group }, index) => {
       const definition = LEAVES[index];
@@ -81,11 +84,11 @@ export class Renderer {
         leaf.angle.value;
       group.setAttribute(
         'transform',
-        `translate(${xAt(definition.height)} ${CONFIG.baseY - definition.height * CONFIG.stemHeight}) rotate(${angle}) scale(${definition.side * scale} ${scale * (0.35 + leaf.unfurl.value * 0.65)})`,
+        `translate(${xAt(definition.height)} ${GEOMETRY.baseY - definition.height * GEOMETRY.stemHeight}) rotate(${angle}) scale(${definition.side * scale} ${scale * (0.35 + leaf.unfurl.value * 0.65)})`,
       );
     });
     this.phase.textContent = growth.phase;
     this.progress.style.transform = `scaleX(${growth.progress})`;
-    this.elapsed.textContent = `${state.time.toFixed(1).padStart(4, '0')} / 20s`;
+    this.elapsed.textContent = `${state.time.toFixed(1).padStart(4, '0')} / ${CONFIG.cycle}s`;
   }
 }
